@@ -6,7 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
     "tsc:w": "tsc -w",
-    "start": "static-i18n -l en -i hr -i en ./src/ && cp src/custom.css i18n/ && cp src/app.ts i18n/ && cp src/img/* i18n/img/ && cp -R src/locales/ dist/ && concurrently \"npm run tsc:w\" \"parcel ./i18n/index.html\" ",
+    "start": "static-i18n -l en -i hr -i en ./src/ && cp src/custom.css i18n/ && cp src/app.ts i18n/ && cp src/anoteabi.ts i18n/ && cp src/img/* i18n/img/ && cp -R src/locales/ dist/ && concurrently \"npm run tsc:w\" \"parcel ./i18n/index.html\" ",
     "predeploy": "rm -rf dist && cp -R src dist && static-i18n -l en -i en -o ./dist ./src/ && parcel build ./dist/index.html --public-url ./ && cp CNAME dist/ && cp -R src/locales/ dist/",
     "deploy": "gh-pages -b master -d dist -r git@github.com:anoncms/gw.anotedao.com.git"
   },
@@ -24,7 +24,16 @@
     "@metamask/detect-provider": "github:metamask/detect-provider",
     "@metamask/sdk": "^0.5.6",
     "concurrently": "^8.2.0",
+    "ethers": "^6.6.7",
+    "latest-version": "^7.0.0",
     "static-i18n": "^0.2.1",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "web3": "^4.0.3",
+    "jquery": "^3.6.0",
+    "web3-eth-contract": "^4.0.3"
+  },
+  "devDependencies": {
+    "events": "^3.3.0",
+    "process": "^0.11.10"
   }
 }
