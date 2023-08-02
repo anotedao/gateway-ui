@@ -3,7 +3,7 @@
 <head>
    <meta charset="utf-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <title data-t>Anote Gateway</title>
+   <title>Anote Gateway</title>
    <meta name="description" content="Anote Gateway">
    <meta name="viewport" content="width=device-width, initial-scale=1">
    <link rel="icon" type="image/png" href="./img/favicon.png" />
@@ -54,9 +54,12 @@
                      </div>
                      <h5 class="mt-3"><u>BSC -> Anote</u></h5>
                      <div class="d-grid mt-2">
-                        <label class="form-label fw-bold" data-t>Amount</label>
+                        <label class="form-label fw-bold">Address</label>
+                        <input type="text" class="form-control" id="address">
+                        <label class="form-label fw-bold mt-2">Amount</label>
                         <input type="text" class="form-control" id="amount">
-                        <button class="btn-lg btn-success mt-3">Send to Anote</button>
+                        <p class="text-danger mb-0 mt-1" id="errMsg" style="display: none;"></p>
+                        <button class="btn-lg btn-success mt-3" id="dbtn">Send to Anote</button>
                      </div>
                   </div>
                </div>

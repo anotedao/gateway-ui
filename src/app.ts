@@ -12,68 +12,97 @@ let provider;
 let contract;
 
 declare global {
-  interface Window {
-    ethereum?: ExternalProvider;
-  }
+    interface Window {
+        ethereum?: ExternalProvider;
+    }
 }
 
 const start = async () => {
-  if (window.ethereum !== undefined && window.ethereum.request !== undefined) {
-    const accounts = await window.ethereum.request({
-      method: 'eth_requestAccounts',
-      params: [],
-    });
+    if (window.ethereum !== undefined && window.ethereum.request !== undefined) {
+        const accounts = await window.ethereum.request({
+            method: 'eth_requestAccounts',
+            params: [],
+        });
 
-    provider = new ethers.providers.Web3Provider(window.ethereum)
-    signer = await provider.getSigner();
+        provider = new ethers.providers.Web3Provider(window.ethereum)
+        signer = await provider.getSigner();
 
-    if (signer != null) {
-      contract = new ethers.Contract(contractAddress, AnoteAbi, signer);
-      contract.connect(provider);
-  
-      // var tx = await contract.deposit("fdsafsdafdsa", 100000000);
-  
-      // await tx.wait()
-  
-      if (accounts != null) {
-        var we = await contract.withdrawExists(accounts[0]);
-        if (we) {
-          $("#wbtn").removeClass("btn-secondary");
-          $("#wbtn").addClass("btn-success");
-          $("#wbtn").prop("disabled", false);
-        } else {
-          $("#nowe").fadeIn();
+        if (signer != null) {
+            contract = new ethers.Contract(contractAddress, AnoteAbi, signer);
+            contract.connect(provider);
+    
+            if (accounts != null) {
+                var we = await contract.withdrawExists(accounts[0]);
+                if (we) {
+                    $("#wbtn").removeClass("btn-secondary");
+                    $("#wbtn").addClass("btn-success");
+                    $("#wbtn").prop("disabled", false);
+                } else {
+                    $("#nowe").fadeIn();
+                }
+            }
         }
-      }
     }
-  }
 };
 
 if (window.ethereum == null || window.ethereum == undefined) {
-  $("#loading").fadeOut(function() {
-    $("#error").fadeIn();
-  });
+    $("#loading").fadeOut(function() {
+        $("#error").fadeIn();
+    });
 } else {
-  $("#loading").fadeOut(function() {
-    $("#success").fadeIn();
-    start();
-  });
+    $("#loading").fadeOut(function() {
+        $("#success").fadeIn();
+        start();
+    });
 }
 
 $("#wbtn").on("click", async function() {
-  $("#success").fadeOut(function() {
-    $("#loading").fadeIn();
-  });
-  const options = {value: ethers.utils.parseEther("0.001")};
-  try {
-    var tx = await contract.withdraw(options);
-    var r = await tx.wait();
-    $("#loading").fadeOut(function() {
-      $("#success").fadeIn();
+    $("#success").fadeOut(function() {
+        $("#loading").fadeIn();
     });
-  } catch (e) {
-    $("#loading").fadeOut(function() {
-      $("#success").fadeIn();
-    });
-  }
+    const options = {value: ethers.utils.parseEther("0.001")};
+    try {
+        var tx = await contract.withdraw(options);
+        var r = await tx.wait();
+        $("#loading").fadeOut(function() {
+            $("#success").fadeIn();
+        });
+    } catch (e) {
+        console.log(e);
+        $("#loading").fadeOut(function() {
+            $("#success").fadeIn();
+        });
+    }
+});
+
+$("#dbtn").on("click", async function() {
+    var address = $("#address").val();
+    var amount = $("#amount").val();
+
+    if (address && amount && address?.toString().length > 0 && amount?.toString().length > 0) {
+        $("#success").fadeOut(function() {
+            $("#loading").fadeIn();
+        });
+        try {
+            amount = Math.floor(parseFloat(amount?.toString()) * 100000000);
+            var tx = await contract.deposit(address, amount);
+            await tx.wait()
+        } catch (e) {
+            console.log(e);
+        }
+
+        $("#address").val('');
+        $("#amount").val('');
+
+        $("#loading").fadeOut(function() {
+            $("#success").fadeIn();
+        });
+    } else {
+        $("#errMsg").html("Both fields are required.");
+        $("#errMsg").fadeIn(function() {
+            setTimeout(function() {
+                $("#errMsg").fadeOut();
+            }, 2000);
+        });
+    }
 });
