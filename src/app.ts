@@ -57,22 +57,25 @@ if (window.ethereum == null || window.ethereum == undefined) {
 }
 
 $("#wbtn").on("click", async function() {
-    $("#success").fadeOut(function() {
+    $("#success").fadeOut(async function() {
         $("#loading").fadeIn();
+
+        const options = {value: ethers.utils.parseEther("0.001")};
+        try {
+            var tx = await contract.withdraw(options);
+            var r = await tx.wait();
+            $("#loading").fadeOut(function() {
+                $("#success").fadeIn();
+            });
+        } catch (e: any) {
+            console.log(e);
+            $("#errMsg").html(e.message);
+            $("#errMsg").show();
+            $("#loading").fadeOut(function() {
+                $("#success").fadeIn();
+            });
+        }
     });
-    const options = {value: ethers.utils.parseEther("0.001")};
-    try {
-        var tx = await contract.withdraw(options);
-        var r = await tx.wait();
-        $("#loading").fadeOut(function() {
-            $("#success").fadeIn();
-        });
-    } catch (e) {
-        console.log(e);
-        $("#loading").fadeOut(function() {
-            $("#success").fadeIn();
-        });
-    }
 });
 
 $("#dbtn").on("click", async function() {
@@ -80,22 +83,30 @@ $("#dbtn").on("click", async function() {
     var amount = $("#amount").val();
 
     if (address && amount && address?.toString().length > 0 && amount?.toString().length > 0) {
-        $("#success").fadeOut(function() {
+        $("#success").fadeOut(async function() {
             $("#loading").fadeIn();
-        });
-        try {
-            amount = Math.floor(parseFloat(amount?.toString()) * 100000000);
-            var tx = await contract.deposit(address, amount);
-            await tx.wait()
-        } catch (e) {
-            console.log(e);
-        }
 
-        $("#address").val('');
-        $("#amount").val('');
+            var address = $("#address").val();
+            var amount = $("#amount").val();
 
-        $("#loading").fadeOut(function() {
-            $("#success").fadeIn();
+            if (address && amount && address?.toString().length > 0 && amount?.toString().length > 0) {
+                try {
+                    amount = Math.floor(parseFloat(amount?.toString()) * 100000000);
+                    var tx = await contract.deposit(address, amount);
+                    await tx.wait()
+                } catch (e: any) {
+                    console.log(e);
+                    $("#errMsg").html(e.message);
+                    $("#errMsg").show();
+                }
+        
+                $("#address").val('');
+                $("#amount").val('');
+            }
+    
+            $("#loading").fadeOut(function() {
+                $("#success").fadeIn();
+            });
         });
     } else {
         $("#errMsg").html("Both fields are required.");
