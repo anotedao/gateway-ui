@@ -3,6 +3,7 @@ import { AnoteAbi } from './anoteabi';
 import { ethers } from 'ethers';
 import { ExternalProvider } from "@ethersproject/providers";
 import $ from 'jquery';
+import { accounts } from 'web3/lib/commonjs/eth.exports';
 
 const contractAddress = '0xe7f0f1585bdbd06b18dbb87099b87bd79bbd315b';
 // const contractAddress = '0xae60E1a4eF26671807411368Cc150631eF1456Fd';
@@ -10,6 +11,7 @@ const contractAddress = '0xe7f0f1585bdbd06b18dbb87099b87bd79bbd315b';
 let signer;
 let provider;
 let contract;
+let accs;
 
 declare global {
     interface Window {
@@ -19,7 +21,7 @@ declare global {
 
 const start = async () => {
     if (window.ethereum !== undefined && window.ethereum.request !== undefined) {
-        const accounts = await window.ethereum.request({
+        accs = await window.ethereum.request({
             method: 'eth_requestAccounts',
             params: [],
         });
@@ -50,8 +52,8 @@ const start = async () => {
             contract = new ethers.Contract(contractAddress, AnoteAbi, signer);
             contract.connect(provider);
     
-            if (accounts != null) {
-                var we = await contract.withdrawExists(accounts[0]);
+            if (accs != null) {
+                var we = await contract.withdrawExists(accs[0]);
                 if (we) {
                     $("#wbtn").removeClass("btn-secondary");
                     $("#wbtn").addClass("btn-success");
@@ -82,7 +84,21 @@ $("#wbtn").on("click", async function() {
     $("#success").fadeOut(async function() {
         $("#loading").fadeIn();
 
-        const options = {value: ethers.utils.parseEther("0.001")};
+        // const accounts = await window.ethereum.request({
+        //     method: 'eth_requestAccounts',
+        //     params: [],
+        // });
+
+       var count = contract._withdrawCount(accs[0]);
+       var cnt = 0;
+       await count;
+       await count.then((response) => cnt = response);
+
+       console.log(cnt);
+
+       var fee = 5000000000000000 * cnt;
+
+        const options = {value: ethers.BigNumber.from(fee)};
         try {
             var tx = await contract.withdraw(options);
             var r = await tx.wait();
